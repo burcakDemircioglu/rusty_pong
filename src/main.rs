@@ -15,6 +15,14 @@ const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
 const BALL_TOLERANCE: f32 = 0.1;
 const PLAYER_SPEED: f32 = 500.0;
 
+fn clamp(value: &mut f32, low: f32, high: f32) {
+    if *value < low {
+        *value = low;
+    } else if *value > high {
+        *value = high;
+    }
+}
+
 struct MainState {
     player_1_pos: na::Point2<f32>,
     player_2_pos: na::Point2<f32>,
@@ -37,6 +45,7 @@ impl MainState {
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let dt = ggez::timer::delta(ctx).as_secs_f32();
+        let screen_h = graphics::drawable_size(ctx).1;
 
         if keyboard::is_key_pressed(ctx, KeyCode::W) {
             self.player_1_pos.y -= PLAYER_SPEED * dt;
@@ -44,12 +53,24 @@ impl event::EventHandler for MainState {
         if keyboard::is_key_pressed(ctx, KeyCode::S) {
             self.player_1_pos.y += PLAYER_SPEED * dt;
         }
-        if keyboard::is_key_pressed(ctx, KeyCode::O) {
+        if keyboard::is_key_pressed(ctx, KeyCode::Up) {
             self.player_2_pos.y -= PLAYER_SPEED * dt;
         }
-        if keyboard::is_key_pressed(ctx, KeyCode::L) {
+        if keyboard::is_key_pressed(ctx, KeyCode::Down) {
             self.player_2_pos.y += PLAYER_SPEED * dt;
         }
+
+        clamp(
+            &mut self.player_1_pos.y,
+            RACKET_HEIGHT_HALF,
+            screen_h - RACKET_HEIGHT_HALF,
+        );
+        clamp(
+            &mut self.player_2_pos.y,
+            RACKET_HEIGHT_HALF,
+            screen_h - RACKET_HEIGHT_HALF,
+        );
+
         Ok(())
     }
 

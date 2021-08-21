@@ -23,6 +23,21 @@ fn clamp(value: &mut f32, low: f32, high: f32) {
     }
 }
 
+fn move_racket(pos: &mut na::Point2<f32>, key_code: KeyCode, y_dir: f32, ctx: &mut Context) {
+    let dt = ggez::timer::delta(ctx).as_secs_f32();
+    let screen_h = graphics::drawable_size(ctx).1;
+
+    if keyboard::is_key_pressed(ctx, key_code) {
+        pos.y = y_dir * PLAYER_SPEED * dt;
+    }
+
+    clamp(
+        &mut pos.y,
+        RACKET_HEIGHT_HALF,
+        screen_h - RACKET_HEIGHT_HALF,
+    );
+}
+
 struct MainState {
     player_1_pos: na::Point2<f32>,
     player_2_pos: na::Point2<f32>,
@@ -44,32 +59,10 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
-        let dt = ggez::timer::delta(ctx).as_secs_f32();
-        let screen_h = graphics::drawable_size(ctx).1;
-
-        if keyboard::is_key_pressed(ctx, KeyCode::W) {
-            self.player_1_pos.y -= PLAYER_SPEED * dt;
-        }
-        if keyboard::is_key_pressed(ctx, KeyCode::S) {
-            self.player_1_pos.y += PLAYER_SPEED * dt;
-        }
-        if keyboard::is_key_pressed(ctx, KeyCode::Up) {
-            self.player_2_pos.y -= PLAYER_SPEED * dt;
-        }
-        if keyboard::is_key_pressed(ctx, KeyCode::Down) {
-            self.player_2_pos.y += PLAYER_SPEED * dt;
-        }
-
-        clamp(
-            &mut self.player_1_pos.y,
-            RACKET_HEIGHT_HALF,
-            screen_h - RACKET_HEIGHT_HALF,
-        );
-        clamp(
-            &mut self.player_2_pos.y,
-            RACKET_HEIGHT_HALF,
-            screen_h - RACKET_HEIGHT_HALF,
-        );
+        move_racket(&mut self.player_1_pos, KeyCode::W, -1.0, ctx);
+        move_racket(&mut self.player_1_pos, KeyCode::S, 1.0, ctx);
+        move_racket(&mut self.player_2_pos, KeyCode::Up, -1.0, ctx);
+        move_racket(&mut self.player_2_pos, KeyCode::Down, 1.0, ctx);
 
         Ok(())
     }

@@ -1,6 +1,7 @@
 use ggez::{
     self, event,
     graphics::{self, DrawMode},
+    input::keyboard::{self, KeyCode},
     nalgebra as na, Context, GameResult,
 };
 
@@ -12,6 +13,7 @@ const BALL_SIZE: f32 = 30.0;
 const BALL_STROKE: f32 = 3.5;
 const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
 const BALL_TOLERANCE: f32 = 0.1;
+const PLAYER_SPEED: f32 = 500.0;
 
 struct MainState {
     player_1_pos: na::Point2<f32>,
@@ -33,9 +35,24 @@ impl MainState {
 }
 
 impl event::EventHandler for MainState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
+        let dt = ggez::timer::delta(ctx).as_secs_f32();
+
+        if keyboard::is_key_pressed(ctx, KeyCode::W) {
+            self.player_1_pos.y -= PLAYER_SPEED * dt;
+        }
+        if keyboard::is_key_pressed(ctx, KeyCode::S) {
+            self.player_1_pos.y += PLAYER_SPEED * dt;
+        }
+        if keyboard::is_key_pressed(ctx, KeyCode::O) {
+            self.player_2_pos.y -= PLAYER_SPEED * dt;
+        }
+        if keyboard::is_key_pressed(ctx, KeyCode::L) {
+            self.player_2_pos.y += PLAYER_SPEED * dt;
+        }
         Ok(())
     }
+
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
 

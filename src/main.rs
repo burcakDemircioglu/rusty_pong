@@ -15,7 +15,7 @@ const BALL_STROKE: f32 = 3.5;
 const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
 const BALL_TOLERANCE: f32 = 0.1;
 const PLAYER_SPEED: f32 = 500.0;
-const BALL_SPEED: f32 = 50.0;
+const BALL_SPEED: f32 = 150.0;
 
 fn clamp(value: &mut f32, low: f32, high: f32) {
     if *value < low {
@@ -101,6 +101,14 @@ impl event::EventHandler for MainState {
             self.ball_pos = na::Point2::new(screen_w_half, screen_h_half);
             randomize_vec(&mut self.ball_vel, BALL_SPEED, BALL_SPEED);
             self.player_1_score += 1;
+        }
+        if self.ball_pos.y < BALL_SIZE_HALF {
+            self.ball_pos.y = BALL_SIZE_HALF;
+            self.ball_vel.y = self.ball_vel.y.abs();
+        }
+        if self.ball_pos.y > screen_h - BALL_SIZE_HALF {
+            self.ball_pos.y = screen_h - BALL_SIZE_HALF;
+            self.ball_vel.y = -self.ball_vel.y;
         }
         Ok(())
     }

@@ -1,6 +1,6 @@
 use ggez::{
     self, event,
-    graphics::{self, DrawMode},
+    graphics::{self, DrawMode, Text},
     input::keyboard::{self, KeyCode},
     nalgebra as na, Context, GameResult,
 };
@@ -82,14 +82,26 @@ impl MainState {
 
 impl event::EventHandler for MainState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
+        let dt = ggez::timer::delta(ctx).as_secs_f32();
+        let (screen_w, screen_h) = graphics::drawable_size(ctx);
+        let (screen_w_half, screen_h_half) = (screen_w * 0.5, screen_h * 0.5);
+
         move_racket(&mut self.player_1_pos, KeyCode::W, -1.0, ctx);
         move_racket(&mut self.player_1_pos, KeyCode::S, 1.0, ctx);
         move_racket(&mut self.player_2_pos, KeyCode::Up, -1.0, ctx);
         move_racket(&mut self.player_2_pos, KeyCode::Down, 1.0, ctx);
 
-        let dt = ggez::timer::delta(ctx).as_secs_f32();
         self.ball_pos += self.ball_vel * dt;
 
+        if self.ball_pos.x < 0.0 {
+            self.ball_pos = na::Point2::new(screen_w_half, screen_h_half);
+            randomize_vec(&mut self.ball_vel, BALL_SPEED, BALL_SPEED);
+            self.player_2_score += 1;
+        } else if self.ball_pos.x > screen_w {
+            self.ball_pos = na::Point2::new(screen_w_half, screen_h_half);
+            randomize_vec(&mut self.ball_vel, BALL_SPEED, BALL_SPEED);
+            self.player_1_score += 1;
+        }
         Ok(())
     }
 
@@ -128,6 +140,17 @@ impl event::EventHandler for MainState {
         )?;
 
         graphics::draw(ctx, &ball_mesh, graphics::DrawParam::default())?;
+
+        let screen_w = graphics::drawable_size(ctx).0;
+        let screen_w_half = screen_w * 0.5;
+        let score_text = Text::new(format!("{}:{}", self.player_1_score, self.player_2_score));
+
+        let (score_text_w, score_text_h) = score_text.dimensions(ctx);
+        let mut score_pos = na::Point2::new(screen_w_half, 20.0);
+        score_pos -= na::Vector2::new(score_text_w as f32 * 0.5, score_text_h as f32 * 0.5);
+
+        draw_param.dest = score_pos.into();
+        graphics::draw(ctx, &score_text, draw_param)?;
 
         graphics::present(ctx)?;
         Ok(())

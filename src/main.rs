@@ -28,7 +28,7 @@ fn move_racket(pos: &mut na::Point2<f32>, key_code: KeyCode, y_dir: f32, ctx: &m
     let screen_h = graphics::drawable_size(ctx).1;
 
     if keyboard::is_key_pressed(ctx, key_code) {
-        pos.y = y_dir * PLAYER_SPEED * dt;
+        pos.y += y_dir * PLAYER_SPEED * dt;
     }
 
     clamp(

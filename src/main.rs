@@ -6,6 +6,7 @@ use ggez::{
 };
 use rand::{thread_rng, Rng};
 
+const RACKET_PADDING: f32 = 20.0;
 const RACKET_HEIGHT: f32 = 100.0;
 const RACKET_WIDTH: f32 = 20.0;
 const RACKET_HEIGHT_HALF: f32 = RACKET_HEIGHT * 0.5;
@@ -70,8 +71,11 @@ impl MainState {
         randomize_vec(&mut ball_vel, BALL_SPEED, BALL_SPEED);
 
         MainState {
-            player_1_pos: na::Point2::new(RACKET_WIDTH_HALF, screen_h_half),
-            player_2_pos: na::Point2::new(screen_w - RACKET_WIDTH_HALF, screen_h_half),
+            player_1_pos: na::Point2::new(RACKET_WIDTH_HALF + RACKET_PADDING, screen_h_half),
+            player_2_pos: na::Point2::new(
+                screen_w - RACKET_WIDTH_HALF - RACKET_PADDING,
+                screen_h_half,
+            ),
             ball_pos: na::Point2::new(screen_w_half, screen_h_half),
             ball_vel: ball_vel,
             player_1_score: 0,

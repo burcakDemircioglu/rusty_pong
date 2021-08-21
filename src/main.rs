@@ -4,6 +4,7 @@ use ggez::{
     input::keyboard::{self, KeyCode},
     nalgebra as na, Context, GameResult,
 };
+use rand::{thread_rng, Rng};
 
 const RACKET_HEIGHT: f32 = 100.0;
 const RACKET_WIDTH: f32 = 20.0;
@@ -14,6 +15,7 @@ const BALL_STROKE: f32 = 3.5;
 const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
 const BALL_TOLERANCE: f32 = 0.1;
 const PLAYER_SPEED: f32 = 500.0;
+const BALL_SPEED: f32 = 50.0;
 
 fn clamp(value: &mut f32, low: f32, high: f32) {
     if *value < low {
@@ -38,11 +40,25 @@ fn move_racket(pos: &mut na::Point2<f32>, key_code: KeyCode, y_dir: f32, ctx: &m
     );
 }
 
+fn randomize_vec(vec: &mut na::Vector2<f32>, x: f32, y: f32) {
+    let mut rng = thread_rng();
+    vec.x = match rng.gen_bool(0.5) {
+        true => x,
+        false => -x,
+    };
+    vec.y = match rng.gen_bool(0.5) {
+        true => y,
+        false => -y,
+    };
+}
+
 struct MainState {
     player_1_pos: na::Point2<f32>,
     player_2_pos: na::Point2<f32>,
     ball_pos: na::Point2<f32>,
     ball_vel: na::Vector2<f32>,
+    player_1_score: i32,
+    player_2_score: i32,
 }
 
 impl MainState {
@@ -50,11 +66,16 @@ impl MainState {
         let (screen_w, screen_h) = graphics::drawable_size(context);
         let (screen_w_half, screen_h_half) = (screen_w * 0.5, screen_h * 0.5);
 
+        let mut ball_vel = na::Vector2::new(0.0, 0.0);
+        randomize_vec(&mut ball_vel, BALL_SPEED, BALL_SPEED);
+
         MainState {
             player_1_pos: na::Point2::new(RACKET_WIDTH_HALF, screen_h_half),
             player_2_pos: na::Point2::new(screen_w - RACKET_WIDTH_HALF, screen_h_half),
             ball_pos: na::Point2::new(screen_w_half, screen_h_half),
-            ball_vel: na::Vector2::new(10.0, 5.0),
+            ball_vel: ball_vel,
+            player_1_score: 0,
+            player_2_score: 0,
         }
     }
 }

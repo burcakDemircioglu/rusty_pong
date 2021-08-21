@@ -1,0 +1,12 @@
+pub const MIDDLE_LINE_WIDTH: f32 = 2.0;
+pub const RACKET_PADDING: f32 = 20.0;
+pub const RACKET_HEIGHT: f32 = 100.0;
+pub const RACKET_WIDTH: f32 = 20.0;
+pub const RACKET_HEIGHT_HALF: f32 = RACKET_HEIGHT * 0.5;
+pub const RACKET_WIDTH_HALF: f32 = RACKET_WIDTH * 0.5;
+pub const BALL_SIZE: f32 = 30.0;
+pub const BALL_STROKE: f32 = 3.5;
+pub const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
+pub const BALL_TOLERANCE: f32 = 0.1;
+pub const PLAYER_SPEED: f32 = 500.0;
+pub const BALL_SPEED: f32 = 300.0;

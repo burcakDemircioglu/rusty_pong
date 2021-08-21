@@ -112,8 +112,27 @@ impl event::EventHandler for MainState {
         }
         if self.ball_pos.y > screen_h - BALL_SIZE_HALF {
             self.ball_pos.y = screen_h - BALL_SIZE_HALF;
-            self.ball_vel.y = -self.ball_vel.y;
+            self.ball_vel.y = -self.ball_vel.y.abs();
         }
+
+        let intersects_player_1 = 
+            self.ball_pos.x - BALL_SIZE_HALF < self.player_1_pos.x + RACKET_WIDTH_HALF
+            && self.ball_pos.x - BALL_SIZE_HALF > self.player_1_pos.x - RACKET_WIDTH_HALF
+            && self.ball_pos.y < self.player_1_pos.y + RACKET_HEIGHT_HALF
+            && self.ball_pos.y > self.player_1_pos.y - RACKET_HEIGHT_HALF;
+
+        let intersects_player_2 = 
+            self.ball_pos.x + BALL_SIZE_HALF > self.player_2_pos.x - RACKET_WIDTH_HALF
+            && self.ball_pos.x + BALL_SIZE_HALF < self.player_2_pos.x + RACKET_WIDTH_HALF
+            && self.ball_pos.y < self.player_2_pos.y + RACKET_HEIGHT_HALF
+            && self.ball_pos.y > self.player_2_pos.y - RACKET_HEIGHT_HALF;
+
+        if intersects_player_1 {
+            self.ball_vel.x = self.ball_vel.x.abs();
+        } else if intersects_player_2 {
+            self.ball_vel.x = -self.ball_vel.x.abs();
+        }
+
         Ok(())
     }
 

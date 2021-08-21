@@ -6,6 +6,7 @@ use ggez::{
 };
 use rand::{thread_rng, Rng};
 
+const MIDDLE_LINE_WIDTH: f32 = 2.0;
 const RACKET_PADDING: f32 = 20.0;
 const RACKET_HEIGHT: f32 = 100.0;
 const RACKET_WIDTH: f32 = 20.0;
@@ -16,7 +17,7 @@ const BALL_STROKE: f32 = 3.5;
 const BALL_SIZE_HALF: f32 = BALL_SIZE * 0.5;
 const BALL_TOLERANCE: f32 = 0.1;
 const PLAYER_SPEED: f32 = 500.0;
-const BALL_SPEED: f32 = 150.0;
+const BALL_SPEED: f32 = 300.0;
 
 fn clamp(value: &mut f32, low: f32, high: f32) {
     if *value < low {
@@ -115,14 +116,14 @@ impl event::EventHandler for MainState {
             self.ball_vel.y = -self.ball_vel.y.abs();
         }
 
-        let intersects_player_1 = 
-            self.ball_pos.x - BALL_SIZE_HALF < self.player_1_pos.x + RACKET_WIDTH_HALF
+        let intersects_player_1 = self.ball_pos.x - BALL_SIZE_HALF
+            < self.player_1_pos.x + RACKET_WIDTH_HALF
             && self.ball_pos.x - BALL_SIZE_HALF > self.player_1_pos.x - RACKET_WIDTH_HALF
             && self.ball_pos.y < self.player_1_pos.y + RACKET_HEIGHT_HALF
             && self.ball_pos.y > self.player_1_pos.y - RACKET_HEIGHT_HALF;
 
-        let intersects_player_2 = 
-            self.ball_pos.x + BALL_SIZE_HALF > self.player_2_pos.x - RACKET_WIDTH_HALF
+        let intersects_player_2 = self.ball_pos.x + BALL_SIZE_HALF
+            > self.player_2_pos.x - RACKET_WIDTH_HALF
             && self.ball_pos.x + BALL_SIZE_HALF < self.player_2_pos.x + RACKET_WIDTH_HALF
             && self.ball_pos.y < self.player_2_pos.y + RACKET_HEIGHT_HALF
             && self.ball_pos.y > self.player_2_pos.y - RACKET_HEIGHT_HALF;
@@ -138,6 +139,20 @@ impl event::EventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         graphics::clear(ctx, graphics::BLACK);
+        let mut draw_param = graphics::DrawParam::default();
+        let (screen_w, screen_h) = graphics::drawable_size(ctx);
+        let screen_w_half = screen_w * 0.5;
+
+        // Draw middle line
+        let (origin, dest) = (
+            na::Point2::new(screen_w_half, 0.0),
+            na::Point2::new(screen_w_half, screen_h),
+        );
+
+        let middleline_mesh =
+            graphics::Mesh::new_line(ctx, &[origin, dest], MIDDLE_LINE_WIDTH, graphics::WHITE)?;
+
+        graphics::draw(ctx, &middleline_mesh, draw_param)?;
 
         // Draw rackets
         let racket_rect = graphics::Rect::new(
@@ -153,7 +168,6 @@ impl event::EventHandler for MainState {
             graphics::WHITE,
         )?;
 
-        let mut draw_param = graphics::DrawParam::default();
         draw_param.dest = self.player_1_pos.into();
         graphics::draw(ctx, &racket_mesh, draw_param)?;
 
@@ -172,9 +186,9 @@ impl event::EventHandler for MainState {
 
         graphics::draw(ctx, &ball_mesh, graphics::DrawParam::default())?;
 
-        let screen_w = graphics::drawable_size(ctx).0;
-        let screen_w_half = screen_w * 0.5;
-        let score_text = Text::new(format!("{}:{}", self.player_1_score, self.player_2_score));
+        // Draw score board
+        let mut score_text = Text::new(format!("{}  {}", self.player_1_score, self.player_2_score));
+        score_text.set_font(graphics::Font::default(), graphics::Scale::uniform(24.0));
 
         let (score_text_w, score_text_h) = score_text.dimensions(ctx);
         let mut score_pos = na::Point2::new(screen_w_half, 20.0);

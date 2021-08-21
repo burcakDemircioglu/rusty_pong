@@ -42,6 +42,7 @@ struct MainState {
     player_1_pos: na::Point2<f32>,
     player_2_pos: na::Point2<f32>,
     ball_pos: na::Point2<f32>,
+    ball_vel: na::Vector2<f32>,
 }
 
 impl MainState {
@@ -53,6 +54,7 @@ impl MainState {
             player_1_pos: na::Point2::new(RACKET_WIDTH_HALF, screen_h_half),
             player_2_pos: na::Point2::new(screen_w - RACKET_WIDTH_HALF, screen_h_half),
             ball_pos: na::Point2::new(screen_w_half, screen_h_half),
+            ball_vel: na::Vector2::new(10.0, 5.0),
         }
     }
 }
@@ -63,6 +65,9 @@ impl event::EventHandler for MainState {
         move_racket(&mut self.player_1_pos, KeyCode::S, 1.0, ctx);
         move_racket(&mut self.player_2_pos, KeyCode::Up, -1.0, ctx);
         move_racket(&mut self.player_2_pos, KeyCode::Down, 1.0, ctx);
+
+        let dt = ggez::timer::delta(ctx).as_secs_f32();
+        self.ball_pos += self.ball_vel * dt;
 
         Ok(())
     }
